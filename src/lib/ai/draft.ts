@@ -59,11 +59,16 @@ export async function generateDraft(family: Family, events: string): Promise<Dra
 
   const msg = await client.messages.create({
     model: DRAFT_MODEL,
-    max_tokens: 1024,
+    max_tokens: 2048,
     system: STONEBRIDGE_VOICE,
     messages: [{ role: "user", content: buildUserPrompt(family, events) }],
   });
-
+if (msg.stop_reason === "max_tokens") {
+  throw new Error(
+    "The draft was cut off before it finished (hit the token limit). " +
+    "Try shorter advisor notes, or raise max_tokens in lib/ai/draft.ts."
+  );
+}
   const text = msg.content
     .filter((b): b is Anthropic.TextBlock => b.type === "text")
     .map((b) => b.text)
