@@ -41,10 +41,15 @@ export default function ReviewEditor({ family }: { family: Family }) {
   });
 
   const onApprove = () => start(async () => {
+    if (warnings.length > 0) { setMsg("Resolve the number-safety warnings before approving."); return; }
+    const saved = await saveDraftAction(family.id, verdict, changedArray(), quarter, deskBody);
+    if (!saved.ok) { setMsg(saved.error || "Save failed — not approved."); return; }
     const r = await approveAction(family.id); setStatus(r.status as Family["status"]); setMsg("Approved. Ready to publish.");
   });
 
   const onPublish = () => start(async () => {
+    const saved = await saveDraftAction(family.id, verdict, changedArray(), quarter, deskBody);
+    if (!saved.ok) { setMsg(saved.error || "Save failed — not published."); return; }
     const r = await publishAction(family.id); setStatus(r.status as Family["status"]); setMsg("Published. The client can now see it.");
   });
 
@@ -83,9 +88,9 @@ export default function ReviewEditor({ family }: { family: Family }) {
 
       <div style={box}>
         <span style={label}>Verdict (one line)</span>
-        <input value={verdict} onChange={(e) => setVerdict(e.target.value)} style={input} />
+        <input value={verdict} onChange={(e) => { setVerdict(e.target.value); setWarnings([]); }} style={input} />
         <span style={{ ...label, marginTop: 16 }}>What changed (one per line)</span>
-        <textarea value={changedText} onChange={(e) => setChangedText(e.target.value)} rows={4} style={{ ...input, resize: "vertical" }} />
+        <textarea value={changedText} onChange={(e) => { setChangedText(e.target.value); setWarnings([]); }} rows={4} style={{ ...input, resize: "vertical" }} />
         <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
           <div style={{ width: 120 }}>
             <span style={label}>Quarter</span>
@@ -93,14 +98,14 @@ export default function ReviewEditor({ family }: { family: Family }) {
           </div>
           <div style={{ flex: 1 }}>
             <span style={label}>From the desk</span>
-            <textarea value={deskBody} onChange={(e) => setDeskBody(e.target.value)} rows={3} style={{ ...input, resize: "vertical" }} />
+            <textarea value={deskBody} onChange={(e) => { setDeskBody(e.target.value); setWarnings([]); }} rows={3} style={{ ...input, resize: "vertical" }} />
           </div>
         </div>
         <button onClick={onSave} disabled={pending} style={{ ...btn(T.slate, pending), marginTop: 14 }}>Save draft</button>
       </div>
 
       <div style={{ ...box, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <button onClick={onApprove} disabled={pending || status !== "draft"} style={btn(T.olive, pending || status !== "draft")}>Approve</button>
+        <button onClick={onApprove} disabled={pending || status !== "draft" || warnings.length > 0} style={btn(T.olive, pending || status !== "draft" || warnings.length > 0)}>Approve</button>
         <button onClick={onPublish} disabled={pending || status !== "approved"} style={btn(T.navy, pending || status !== "approved")}>Publish to client</button>
         <Link href={`/family/${family.id}`} style={{ fontSize: 13, color: T.navy, fontWeight: 600, marginLeft: "auto" }}>View live dashboard →</Link>
       </div>
