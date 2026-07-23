@@ -40,6 +40,9 @@ export default function ReviewEditor({ family }: { family: Family }) {
     setMsg(r.ok ? "Saved." : (r.error || "Save failed."));
   });
 
+  // INVARIANT: Approve must refuse when warnings.length > 0, and must save
+  // current on-screen fields via saveDraftAction before flipping status.
+  // Do not remove the save-before-approve call or the warnings.length check.
   const onApprove = () => start(async () => {
     if (warnings.length > 0) { setMsg("Resolve the number-safety warnings before approving."); return; }
     const saved = await saveDraftAction(family.id, verdict, changedArray(), quarter, deskBody);
@@ -47,6 +50,9 @@ export default function ReviewEditor({ family }: { family: Family }) {
     const r = await approveAction(family.id); setStatus(r.status as Family["status"]); setMsg("Approved. Ready to publish.");
   });
 
+  // INVARIANT: Publish must save current on-screen fields via saveDraftAction
+  // before flipping status, so a stale or unsaved edit can never ship to the
+  // client. Do not remove the save-before-publish call.
   const onPublish = () => start(async () => {
     const saved = await saveDraftAction(family.id, verdict, changedArray(), quarter, deskBody);
     if (!saved.ok) { setMsg(saved.error || "Save failed — not published."); return; }

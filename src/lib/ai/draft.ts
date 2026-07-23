@@ -23,7 +23,8 @@ function allowedFigures(f: Family): Set<string> {
 }
 
 // Flag any $ or % figure in the generated text that is not present in source data.
-function checkNumbers(text: string, allowed: Set<string>): string[] {
+// Exported for regression testing — see src/lib/ai/draft.test.ts.
+export function checkNumbers(text: string, allowed: Set<string>): string[] {
   const found = text.match(/\$[\d.,]+[MBK]?|\b\d+(\.\d+)?%/g) ?? [];
   const warnings: string[] = [];
   for (const token of found) {
