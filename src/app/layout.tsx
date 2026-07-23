@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   description: "Client portfolio dashboards for Stonebridge Wealth Management.",
 };
 
+// Every route needs a per-request auth check (Clerk middleware), so nothing
+// here can be statically prerendered/cached — a static page can't be
+// redirected to /sign-in by middleware at request time.
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
