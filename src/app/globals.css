@@ -1,0 +1,12 @@
+/* Lato loads from Google Fonts. Montserrat stands in for Gotham (licensed) until
+   you self-host Gotham — it's first in --font-display, so it takes over when present. */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap');
+
+:root {
+  --font-body: 'Lato', -apple-system, system-ui, sans-serif;
+  --font-display: 'Gotham', 'Montserrat', -apple-system, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #F4F6F8; }
+a { color: inherit; text-decoration: none; }
