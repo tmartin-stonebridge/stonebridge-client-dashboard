@@ -5,3 +5,9 @@ out
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Netlify folder
+.netlify
+
+# Local Supabase CLI cache
+supabase/.temp
